@@ -1,0 +1,7 @@
+--- # Run all playbooks in a specific order
+- import_playbook: linux.yml
+- import_playbook: nginx/main.yml
+#- import_playbook: group_tasks/certbot/main.yml # http-01 authentication
+#- import_playbook: group_tasks/lego.yml # dns-01 authentication
+- import_playbook: node_exporter.yml
+#- import_playbook: group_tasks/observability/main.yml # Pending: https://stackoverflow.com/q/77318959/9290

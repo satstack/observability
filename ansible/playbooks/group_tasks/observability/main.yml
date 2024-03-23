@@ -1,0 +1,30 @@
+---
+- hosts: observability
+
+  roles:
+    - role: prometheus.prometheus.alertmanager
+      become: true
+      tags: alertmanager
+    - role: prometheus.prometheus.blackbox_exporter
+      become: true
+      tags: blackbox_exporter
+    - role: prometheus.prometheus.snmp_exporter
+      become: true
+      tags: snmp_exporter
+    - role: prometheus.prometheus.prometheus
+      become: true
+      tags: prometheus
+    - role: grafana.grafana.grafana
+      become: true
+      tags: grafana
+#   - role: beetlejuice.beetlejuice.beetlejuice
+    - role: bleetube.ntfy
+      become: true
+      tags: ntfy
+    - role: bleetube.ntfy-alertmanager
+      tags: ntfy-alertmanager
+
+  tasks:
+    - name: Import nginx_conf as a task to isolate variable scope from other playbooks.
+      import_tasks: tasks/nginx_conf.yml
+      tags: nginx

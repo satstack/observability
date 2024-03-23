@@ -1,0 +1,39 @@
+---
+collections:
+
+    # Warning: does not consistently bring in the latest version of the nginx_conf role
+  - name: nginxinc.nginx_core
+    src: https://github.com/nginxinc/ansible-collection-nginx
+    version: '>=0.6.0'
+
+  - name: prometheus.prometheus
+    src: https://github.com/prometheus-community/ansible
+#   version: '>=0.5.0'
+
+  - name: grafana.grafana
+    src: https://github.com/grafana/grafana-ansible-collection
+#   version: '>=2.1.4'
+
+roles:
+
+  - name: bleetube.dotfiles
+    src:  https://github.com/bleetube/ansible-role-dotfiles
+
+  - name: bleetube.linux
+    src:  https://github.com/bleetube/ansible-role-linux
+
+  - name: bleetube.lego
+    src:  https://github.com/bleetube/ansible-role-lego
+
+  - name: bleetube.ntfy
+    src:  https://github.com/bleetube/ansible-role-ntfy
+
+  - name: bleetube.ntfy-alertmanager
+    src:  https://github.com/bleetube/ansible-role-ntfy-alertmanager
+
+  - src: https://github.com/nginxinc/ansible-role-nginx
+    name: nginx_core.nginx
+
+  - src: https://github.com/nginxinc/ansible-role-nginx-config
+    name: nginx_core.nginx_config
+    #version: '>=0.7.0'

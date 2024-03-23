@@ -1,0 +1,53 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+      # This is happening on one Archlinux, but the others don't have this issue.
+    - name: Collect systemd information if gather_facts fails to figure it out.
+      ansible.builtin.shell:
+        cmd: systemctl --version | head | awk '{print $2}'
+      when: ansible_facts.systemd is not defined
+      register: systemd_version_result
+      changed_when: false
+
+    - name: Set the missing systemd version
+      ansible.builtin.set_fact:
+        ansible_facts:
+          packages:
+            systemd:
+              - version: "{{ systemd_version_result.stdout }}"
+      when: ansible_facts.systemd is not defined
+      changed_when: false
+
+  roles:
+    - role: prometheus.prometheus.node_exporter
+      tags: node_exporter
+
+  tasks:
+    - name: Configure nginx
+      ansible.builtin.import_role:
+        name: nginx_core.nginx_config
+      tags: nginx
+      vars:
+        nginx_config_http_template_enable: true
+        nginx_config_http_template:
+          - template_file: http/default.conf.j2
+            deployment_location: "/etc/nginx/conf.d/node-exp_{{ inventory_hostname }}.conf"
+            backup: false
+            config:
+              servers:
+                - core:
+                    listen:
+                      # Use IP address in Ansible facts. https://stackoverflow.com/q/39819378/9290
+                      - address: "{{ default_interface_ipv4_address|default(ansible_default_ipv4.address) }}"
+                        ssl: true
+                        port: 4430
+                    include:
+                      - "/etc/nginx/acme_{{ inventory_hostname }}.conf"
+                  locations:
+                    - location: /
+                      proxy:
+                        pass: "http://127.0.0.1:4430"
+                        http_version: 1.1

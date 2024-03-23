@@ -1,0 +1,10 @@
+{
+  "bind": {
+    "TYPE": "BIND"
+  },
+  "namecheap": {
+    "TYPE": "NAMECHEAP",
+    "apikey": "$NAMECHEAP_API_KEY",
+    "apiuser": "$NAMECHEAP_API_USER"
+  }
+}

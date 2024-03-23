@@ -1,0 +1,36 @@
+---
+- hosts: certbot
+
+  pre_tasks:
+    - import_tasks: tasks/dhparams.yml
+      tags: dhparams
+
+    - name: Loop through the Certbot certificate list to configure nginx for each ACME domain
+      include_tasks: tasks/nginx_conf.yml
+      loop: "{{ certbot_certs }}"
+      loop_control:
+        loop_var: acme_domain
+      when: certbot_certs is defined
+      tags: nginx
+
+    - name: Ensure html directory for certbot challenge
+      ansible.builtin.file:
+        path: /var/www/html
+        state: directory
+        mode: 0755
+      become: yes
+
+    - name: Remove default nginx page so it doesn't interfere with certbot
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
+      become: yes
+
+  roles:
+    - role: geerlingguy.certbot
+      become: yes
+      tags: certbot
+      vars:
+        certbot_auto_renew: true
+        certbot_create_if_missing: true
+

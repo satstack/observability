@@ -1,0 +1,28 @@
+---
+- hosts: all, !proxmox
+
+  pre_tasks:
+    - name: Gather facts about the localhost
+      ansible.builtin.setup:
+      delegate_to: localhost
+
+#   - name: Print
+#     debug:
+#       var: ansible_facts
+#   - name: Assert that the local machine is squirtle
+#     ansible.builtin.assert:
+#       that:
+#         - ansible_facts['nodename'] == 'squirtle'
+#       msg: "This playbook should only be run from squirtle."
+
+  roles:
+    - role: bleetube.lego
+      when: ansible_nodename == 'squirtle'
+
+  tasks:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+      tags: nginx
+      become: yes
